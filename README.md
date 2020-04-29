@@ -36,7 +36,7 @@ output value.
       HostName <ec2_elastic_ip>
       User bitnami
       IdentityFile ~/.ssh/webtrees
-      IdentitiesOnly true
+      IdentitiesOnly yes
     ```
 8. Connect to the application through SSH `ssh webtrees`
 9. Run the following command to see your application credentials:<br>
@@ -59,6 +59,9 @@ output value.
 
 ## Terraform documentation
 
+### Data Sources
+* [template\_file](https://www.terraform.io/docs/providers/template/d/file.html)
+
 ### CloudWatch
 #### Resources
 * [aws\_cloudwatch\_log\_group](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html)
@@ -76,9 +79,15 @@ output value.
 #### Data
 * [aws\_iam\_policy\_document](https://www.terraform.io/docs/providers/aws/d/iam_policy_document.html)
 
+
 #### Resources
-* [aws\_iam\_role](https://www.terraform.io/docs/providers/aws/r/iam_role.html)
 * [aws\_iam\_instance\_profile](https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html)
+* [aws\_iam\_role](https://www.terraform.io/docs/providers/aws/r/iam_role.html)
+* [aws\_iam\_role\_policy\_attachment](https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html)
+
+### SSM
+#### Resources
+* [aws\_ssm\_parameter](https://www.terraform.io/docs/providers/aws/r/ssm_parameter.html)
 
 ### VPC
 #### Data

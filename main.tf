@@ -62,6 +62,14 @@ data "aws_iam_policy_document" "ec2_role_policy" {
   }
 }
 
+data "template_file" "user_data" {
+  template = file("user_data.sh")
+  vars = {
+    region                   = var.region
+    ec2_cloudwatch_parameter = aws_ssm_parameter.ec2_cloudwatch_parameter.name
+  }
+}
+
 /* Resources */
 
 resource "aws_security_group" "webtrees" {
@@ -111,14 +119,29 @@ resource "aws_instance" "webtrees" {
   vpc_security_group_ids = [aws_security_group.webtrees.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   monitoring             = false
-  user_data              = file("user_data.sh")
+  user_data              = data.template_file.user_data.rendered
   tags = {
     Name = "webtrees"
   }
 }
 
+resource "aws_eip" "ip" {
+  vpc      = true
+  instance = aws_instance.webtrees.id
+}
+
 resource "aws_iam_role" "ec2_role" {
   assume_role_policy = data.aws_iam_policy_document.ec2_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "amazon_ssm_managed_instance_core_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_server_policy_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
@@ -131,9 +154,11 @@ resource "aws_cloudwatch_log_group" "messages" {
   retention_in_days = 14
 }
 
-resource "aws_eip" "ip" {
-  vpc      = true
-  instance = aws_instance.webtrees.id
+resource "aws_ssm_parameter" "ec2_cloudwatch_parameter" {
+  name        = "AmazonCloudWatch-webtrees"
+  type        = "String"
+  description = "EC2"
+  value       = file("cloudwatch_parameter.json")
 }
 
 /* Outputs */
