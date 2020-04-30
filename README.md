@@ -62,6 +62,12 @@ output value.
 ### Data Sources
 * [template\_file](https://www.terraform.io/docs/providers/template/d/file.html)
 
+### Backup
+#### Resources
+* [aws\_backup\_plan](https://www.terraform.io/docs/providers/aws/r/backup_plan.html)
+* [aws\_backup\_selection](https://www.terraform.io/docs/providers/aws/r/backup_selection.html)
+* [aws\_backup\_vault](https://www.terraform.io/docs/providers/aws/r/backup_vault.html)
+
 ### CloudWatch
 #### Resources
 * [aws\_cloudwatch\_log\_group](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html)
