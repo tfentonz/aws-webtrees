@@ -9,15 +9,30 @@
             "log_group_name": "webtrees-/var/log/messages",
             "log_stream_name": "{instance_id}",
             "timestamp_format": "%b %d %H:%M:%S"
+          },
+          {
+            "file_path": "/opt/bitnami/apache2/logs/error_log",
+            "log_group_name": "webtrees-apache2/logs/error_log",
+            "log_stream_name": "{instance_id}"
+          },
+          {
+            "file_path": "/opt/bitnami/apache2/logs/access_log",
+            "log_group_name": "webtrees-apache2/logs/access_log",
+            "log_stream_name": "{instance_id}"
           }
         ]
       }
     }
   },
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "root"
+  },
   "metrics": {
     "append_dimensions": {
-      "InstanceId": "${!aws:InstanceId}",
-      "InstanceType": "${!aws:InstanceType}"
+      "ImageId": "${aws:ImageId}",
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}"
     },
     "metrics_collected": {
       "collectd": {
@@ -29,7 +44,7 @@
         ],
         "metrics_collection_interval": 60,
         "resources": [
-          "/"
+          "*"
         ]
       },
       "mem": {

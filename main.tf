@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "ec2_role_policy" {
 }
 
 data "template_file" "user_data" {
-  template = file("user_data.sh")
+  template = file("templates/user_data.sh")
   vars = {
     region                   = var.region
     ec2_cloudwatch_parameter = aws_ssm_parameter.ec2_cloudwatch_parameter.name
@@ -154,11 +154,21 @@ resource "aws_cloudwatch_log_group" "messages" {
   retention_in_days = 14
 }
 
+resource "aws_cloudwatch_log_group" "error_log" {
+  name = "webtrees-apache2/logs/error_log"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "access_log" {
+  name = "webtrees-apache2/logs/access_log"
+  retention_in_days = 14
+}
+
 resource "aws_ssm_parameter" "ec2_cloudwatch_parameter" {
   name        = "AmazonCloudWatch-webtrees"
   type        = "String"
   description = "EC2"
-  value       = file("cloudwatch_parameter.json")
+  value       = file("files/ec2_cloudwatch_parameter.json")
 }
 
 /* Outputs */
@@ -168,5 +178,5 @@ output "ip" {
 }
 
 output "setup_wizard_url" {
-  value = "http://${aws_eip.ip.public_ip}/webtrees/"
+  value = "http://${aws_eip.ip.public_ip}/webtrees"
 }
