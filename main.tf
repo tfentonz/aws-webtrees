@@ -20,10 +20,22 @@ variable "my_ip_cidr" {
   default = "123.45.6.78/32"
 }
 
+variable "master_username" {
+  default = "admin"
+}
+
+variable "master_password" {
+  default = "adminpassword"
+}
+
 /* Data Sources */
 
 data "aws_vpc" "default" {
   default = true
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 data "aws_ami" "bitnami_lampstack" {
@@ -107,6 +119,25 @@ resource "aws_security_group_rule" "webtrees_rule_http" {
   security_group_id = aws_security_group.webtrees.id
 }
 
+resource "aws_security_group" "webtrees_aurora" {
+  name        = "webtrees_aurora"
+  description = "Access to the Aurora MySQL cluster"
+  vpc_id      = data.aws_vpc.default.id
+
+  tags = {
+    Name = "webtrees-aurora"
+  }
+}
+
+resource "aws_security_group_rule" "webtrees_aurora_rule_mysql" {
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 3306
+  to_port                  = 3306
+  source_security_group_id = aws_security_group.webtrees.id
+  security_group_id        = aws_security_group.webtrees_aurora.id
+}
+
 resource "aws_key_pair" "webtrees" {
   key_name   = "webtrees"
   public_key = file("~/.ssh/webtrees.pub")
@@ -172,6 +203,33 @@ resource "aws_ssm_parameter" "ec2_cloudwatch_parameter" {
   description = "EC2"
   value       = file("files/ec2_cloudwatch_parameter.json")
 }
+
+resource "aws_rds_cluster" "webtrees" {
+  count                        = 1
+  availability_zones           = data.aws_availability_zones.available.names
+  engine                       = "aurora"
+  engine_version               = "5.6.10a"
+  engine_mode                  = "serverless"
+  cluster_identifier           = "webtrees-aurora-cluster"
+  master_username              = var.master_username
+  master_password              = var.master_password
+  vpc_security_group_ids       = [aws_security_group.webtrees_aurora.id]
+  database_name                = "webtrees"
+  backup_retention_period      = 35
+  storage_encrypted            = true
+  deletion_protection          = true
+  preferred_backup_window      = "16:03-18:03"
+  preferred_maintenance_window = "tue:14:03-tue:14:33"
+
+  scaling_configuration {
+    min_capacity             = 1
+    max_capacity             = 1
+    auto_pause               = true
+    seconds_until_auto_pause = 300
+    timeout_action           = "RollbackCapacityChange"
+  }
+}
+
 
 /* Outputs */
 

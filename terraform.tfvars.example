@@ -1,3 +1,5 @@
-profile    = "default"
-region     = "us-east-1"
-my_ip_cidr = "123.45.6.78/32"
+profile         = "default"
+region          = "us-east-1"
+my_ip_cidr      = "123.45.6.78/32"
+master_username = "admin"
+master_password = "adminpassword"

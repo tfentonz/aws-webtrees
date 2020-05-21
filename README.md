@@ -31,27 +31,44 @@ The EC2 instance user data downloads and installs webtrees app to
 7. Set up the following in `~/.ssh/config` replacing `<elastic_ip>` with the
 output value.
 
-    ```
+    ```ssh-config
     Host webtrees
       HostName <ec2_elastic_ip>
       User bitnami
       IdentityFile ~/.ssh/webtrees
       IdentitiesOnly yes
     ```
+
 8. Connect to the application through SSH `ssh webtrees`
-9. Run the following command to see your application credentials:<br>
+9. Run the following command to see your application credentials:
   `cat ./bitnami_credentials`
-10. Connect to MySQL as root using the application credentials for password:<br>
+10. Connect to MySQL as root using the application credentials for password:
   `mysql --host=localhost --port=5432 --user=root --password`
 11. Create a MySQL database, user, and grant privileges
 
-    ```
+    ```sql
     CREATE DATABASE webtrees;
     CREATE USER 'webtrees'@'localhost' IDENTIFIED BY '<good_secret>';
     GRANT ALL PRIVILEGES ON webtrees.* TO 'webtrees'@'localhost';
     \q
     ```
-12. Open webtrees wizard http://<ec2\_elastic\_ip/webtrees/
+
+12. Open webtrees wizard <http://EC2\_ELASTIC\_IP/webtrees/>
+
+## Start or Stop Services
+
+`sudo /opt/bitnami/ctlscript.sh status`
+
+Restart Apache
+
+`sudo /opt/bitnami/ctlscript.sh restart apache`
+
+## Modules
+
+```bash
+cd /opt/bitnami/apps/webtrees/htdocs
+composer require magicsunday/webtrees-fan-chart --update-no-dev
+```
 
 ## Uninstall
 
@@ -60,48 +77,58 @@ output value.
 ## Terraform documentation
 
 ### Data Sources
+
 * [template\_file](https://www.terraform.io/docs/providers/template/d/file.html)
 
-### Backup
-#### Resources
+### Provider Data Sources
+
+* [aws\_availability\_zones](https://www.terraform.io/docs/providers/aws/d/availability_zones.html)
+
+### Backup Resources
+
 * [aws\_backup\_plan](https://www.terraform.io/docs/providers/aws/r/backup_plan.html)
 * [aws\_backup\_selection](https://www.terraform.io/docs/providers/aws/r/backup_selection.html)
 * [aws\_backup\_vault](https://www.terraform.io/docs/providers/aws/r/backup_vault.html)
 
-### CloudWatch
-#### Resources
+### CloudWatch Resources
+
 * [aws\_cloudwatch\_log\_group](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html)
 
-### EC2
-#### Data
+### EC2 Data
+
 * [aws\_ami](https://www.terraform.io/docs/providers/aws/d/ami.html)
 
-#### Resources
+### EC2 Resources
+
 * [aws\_eip](https://www.terraform.io/docs/providers/aws/r/eip.html)
 * [aws\_instance](https://www.terraform.io/docs/providers/aws/r/instance.html)
 * [aws\_key\_pair](https://www.terraform.io/docs/providers/aws/r/key_pair.html)
 
-### IAM
-#### Data
+### IAM Data
+
 * [aws\_iam\_policy\_document](https://www.terraform.io/docs/providers/aws/d/iam_policy_document.html)
 
+### IAM Resources
 
-#### Resources
 * [aws\_iam\_instance\_profile](https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html)
 * [aws\_iam\_role](https://www.terraform.io/docs/providers/aws/r/iam_role.html)
 * [aws\_iam\_role\_policy\_attachment](https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html)
 
-### SSM
-#### Resources
+### RDS Resources
+
+* [aws\_rds\_cluster](https://www.terraform.io/docs/providers/aws/r/rds_cluster.html)
+
+### SSM Resources
+
 * [aws\_ssm\_parameter](https://www.terraform.io/docs/providers/aws/r/ssm_parameter.html)
 
-### VPC
-#### Data
+### VPC Data
+
 * [aws\_vpc](https://www.terraform.io/docs/providers/aws/d/vpc.html)
 
-#### Resources
+### VPC Resources
+
 * [aws\_security\_group](https://www.terraform.io/docs/providers/aws/r/security_group.html)
 * [aws\_security\_group\_rule](https://www.terraform.io/docs/providers/aws/r/security_group_rule.html)
 
 _[The End](https://open.spotify.com/track/5aHHf6jrqDRb1fcBmue2kn?si=uTAYlm-QTy-ZOZyC_WliVQ)_
-
