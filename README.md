@@ -42,14 +42,14 @@ output value.
 8. Connect to the application through SSH `ssh webtrees`
 9. Run the following command to see your application credentials:
   `cat ./bitnami_credentials`
-10. Connect to MySQL as root using the application credentials for password:
-  `mysql --host=localhost --port=5432 --user=root --password`
+10. Connect to MySQL as admin using the application credentials for password:
+  `mysql --host=<RDS_CLUSTER_ENDPOINT> --port=3306 --user=admin --password`
 11. Create a MySQL database, user, and grant privileges
 
     ```sql
     CREATE DATABASE webtrees;
-    CREATE USER 'webtrees'@'localhost' IDENTIFIED BY '<good_secret>';
-    GRANT ALL PRIVILEGES ON webtrees.* TO 'webtrees'@'localhost';
+    CREATE USER 'webtrees'@'%' IDENTIFIED BY '<good_secret>';
+    GRANT ALL PRIVILEGES ON webtrees.* TO 'webtrees'@'%';
     \q
     ```
 
@@ -68,6 +68,26 @@ Restart Apache
 ```bash
 cd /opt/bitnami/apps/webtrees/htdocs
 composer require magicsunday/webtrees-fan-chart --update-no-dev
+```
+
+## Update IP address
+
+The EC2 security group allows access from your current IP address. If this
+changes the ingress rules will need to be updated.
+
+Edit `terraform.tfvars` with new IP address.
+
+```bash
+terraform plan \
+  -target=aws_security_group_rule.webtrees_rule_http \
+  -target=aws_security_group_rule.webtrees_rule_ssh \
+  -out=$(date +plan-%Y%m%d%H%M%S)`
+```
+
+Copy and paste the terraform apply command.
+
+```bash
+terraform apply "plan-20200102030405"
 ```
 
 ## Uninstall

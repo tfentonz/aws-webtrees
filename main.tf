@@ -107,6 +107,7 @@ resource "aws_security_group_rule" "webtrees_rule_ssh" {
   from_port         = 22
   to_port           = 22
   cidr_blocks       = [var.my_ip_cidr]
+  description       = "SSH for Home"
   security_group_id = aws_security_group.webtrees.id
 }
 
@@ -120,7 +121,7 @@ resource "aws_security_group_rule" "webtrees_rule_http" {
 }
 
 resource "aws_security_group" "webtrees_aurora" {
-  name        = "webtrees_aurora"
+  name        = "webtrees-aurora"
   description = "Access to the Aurora MySQL cluster"
   vpc_id      = data.aws_vpc.default.id
 
@@ -134,6 +135,7 @@ resource "aws_security_group_rule" "webtrees_aurora_rule_mysql" {
   protocol                 = "tcp"
   from_port                = 3306
   to_port                  = 3306
+  description              = "MySQL for EC2 hosts"
   source_security_group_id = aws_security_group.webtrees.id
   security_group_id        = aws_security_group.webtrees_aurora.id
 }
